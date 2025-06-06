@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Простой калькулятор</title>
+    <title>Функциональный калькулятор</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -29,6 +29,7 @@
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             overflow: hidden;
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             transform: translateY(-20px);
             animation: slideUp 0.6s ease-out forwards;
@@ -146,6 +147,97 @@
             color: #FF3B30;
         }
         
+        .memory {
+            color: #4CD964;
+        }
+        
+        .history-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(25, 25, 35, 0.8);
+            border-radius: 15px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            width: 250px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateX(20px);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+        
+        .history-panel.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+        
+        .history-title {
+            font-size: 1.2rem;
+        }
+        
+        .clear-history {
+            background: rgba(255, 59, 48, 0.2);
+            border: none;
+            color: #FF3B30;
+            border-radius: 8px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .clear-history:hover {
+            background: rgba(255, 59, 48, 0.3);
+        }
+        
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(25, 25, 35, 0.8);
+            color: #5AC8FA;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .history-toggle:hover {
+            background: rgba(35, 35, 50, 0.9);
+            transform: rotate(10deg);
+        }
+        
         .calculator-title {
             text-align: center;
             color: white;
@@ -162,6 +254,35 @@
             font-weight: 500;
         }
         
+        .memory-functions {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px 10px;
+            background: rgba(15, 15, 25, 0.9);
+        }
+        
+        .memory-btn {
+            background: rgba(40, 40, 60, 0.7);
+            color: #4CD964;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .memory-btn:hover {
+            background: rgba(50, 50, 70, 0.8);
+        }
+        
+        .memory-display {
+            color: rgba(255, 255, 255, 0.7);
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
         @media (max-width: 500px) {
             .btn {
                 padding: 18px 5px;
@@ -171,16 +292,45 @@
             .result-display {
                 font-size: 2.4rem;
             }
+            
+            .history-panel {
+                width: 90%;
+                right: 5%;
+                left: 5%;
+                max-height: 200px;
+            }
         }
     </style>
 </head>
 <body>
+    <button class="history-toggle" id="historyToggle">
+        <i class="fas fa-history"></i>
+    </button>
+    
+    <div class="history-panel" id="historyPanel">
+        <div class="history-header">
+            <div class="history-title">История вычислений</div>
+            <button class="clear-history" id="clearHistory">Очистить</button>
+        </div>
+        <div id="historyList"></div>
+    </div>
+    
     <div class="calculator-container">
-        <div class="calculator-title">Простой <span>калькулятор</span></div>
+        <div class="calculator-title">Инженерный <span>калькулятор</span></div>
         
         <div class="display">
             <div class="operation-display" id="operationDisplay"></div>
             <div class="result-display" id="resultDisplay">0</div>
+        </div>
+        
+        <div class="memory-functions">
+            <div class="memory-display">Память: <span id="memoryValue">0</span></div>
+            <div>
+                <button class="memory-btn" id="mc">MC</button>
+                <button class="memory-btn" id="mr">MR</button>
+                <button class="memory-btn" id="mPlus">M+</button>
+                <button class="memory-btn" id="mMinus">M-</button>
+            </div>
         </div>
         
         <div class="buttons">
@@ -221,12 +371,19 @@
             // Элементы интерфейса
             const resultDisplay = document.getElementById('resultDisplay');
             const operationDisplay = document.getElementById('operationDisplay');
+            const historyList = document.getElementById('historyList');
+            const historyPanel = document.getElementById('historyPanel');
+            const historyToggle = document.getElementById('historyToggle');
+            const clearHistoryBtn = document.getElementById('clearHistory');
+            const memoryValue = document.getElementById('memoryValue');
             
             // Переменные состояния
             let currentInput = '0';
             let previousInput = '';
             let operation = null;
             let shouldResetScreen = false;
+            let memory = 0;
+            let calculationHistory = [];
             
             // Обновление отображения
             function updateDisplay() {
@@ -325,6 +482,15 @@
                     formattedResult = formatResult(computation);
                 }
                 
+                // Добавляем в историю
+                const historyItem = {
+                    expression: `${previousInput} ${getOperationSymbol(operation)} ${currentInput}`,
+                    result: formattedResult
+                };
+                
+                calculationHistory.unshift(historyItem);
+                updateHistory();
+                
                 currentInput = formattedResult;
                 operation = null;
                 previousInput = '';
@@ -375,6 +541,15 @@
                         return;
                 }
                 
+                // Добавляем в историю
+                const historyItem = {
+                    expression: `${func}(${current})`,
+                    result: formatResult(result)
+                };
+                
+                calculationHistory.unshift(historyItem);
+                updateHistory();
+                
                 currentInput = formatResult(result);
                 updateDisplay();
             }
@@ -395,6 +570,47 @@
                     currentInput = currentInput.slice(0, -1);
                 }
                 updateDisplay();
+            }
+            
+            // Обновление истории
+            function updateHistory() {
+                historyList.innerHTML = '';
+                calculationHistory.slice(0, 10).forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div>${item.expression} =</div>
+                        <div style="font-weight:500;color:#FF9500">${item.result}</div>
+                    `;
+                    historyList.appendChild(historyItem);
+                });
+            }
+            
+            // Управление памятью
+            function clearMemory() {
+                memory = 0;
+                memoryValue.textContent = memory;
+            }
+            
+            function recallMemory() {
+                currentInput = memory.toString();
+                updateDisplay();
+            }
+            
+            function addToMemory() {
+                const current = parseFloat(currentInput);
+                if (!isNaN(current)) {
+                    memory += current;
+                    memoryValue.textContent = formatResult(memory);
+                }
+            }
+            
+            function subtractFromMemory() {
+                const current = parseFloat(currentInput);
+                if (!isNaN(current)) {
+                    memory -= current;
+                    memoryValue.textContent = formatResult(memory);
+                }
             }
             
             // Обработчики событий кнопок
@@ -420,9 +636,35 @@
                 });
             });
             
+            // Обработчики для памяти
+            document.getElementById('mc').addEventListener('click', clearMemory);
+            document.getElementById('mr').addEventListener('click', recallMemory);
+            document.getElementById('mPlus').addEventListener('click', addToMemory);
+            document.getElementById('mMinus').addEventListener('click', subtractFromMemory);
+            
+            // Переключение панели истории
+            historyToggle.addEventListener('click', () => {
+                historyPanel.classList.toggle('show');
+            });
+            
+            // Очистка истории
+            clearHistoryBtn.addEventListener('click', () => {
+                calculationHistory = [];
+                updateHistory();
+            });
+            
+            // Закрытие истории при клике вне панели
+            document.addEventListener('click', (event) => {
+                if (!historyPanel.contains(event.target) && 
+                    !historyToggle.contains(event.target) && 
+                    historyPanel.classList.contains('show')) {
+                    historyPanel.classList.remove('show');
+                }
+            });
+            
             // Инициализация дисплея
             updateDisplay();
         });
     </script>
 </body>
-    </html>
+        </html>
